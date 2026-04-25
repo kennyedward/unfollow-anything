@@ -34,12 +34,27 @@ delaySlider.addEventListener('input', () => {
   delayDisplay.textContent = (parseInt(delaySlider.value) / 1000).toFixed(1) + 's';
 });
 
-// ── LINKEDIN CHECK ───────────────────────────────────
+// ── PLATFORM DETECTION ───────────────────────────────
+function detectPlatform(url) {
+  if (url.includes('linkedin.com')) return 'LinkedIn';
+  if (url.includes('x.com') || url.includes('twitter.com')) return 'X (Twitter)';
+  if (url.includes('reddit.com')) return 'Reddit';
+  return null;
+}
+
 chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
   const url = tabs[0]?.url || '';
-  if (!url.includes('linkedin.com')) {
+  const platform = detectPlatform(url);
+  if (!platform) {
     mainUI.style.display = 'none';
     notLinkedin.style.display = 'block';
+  } else {
+    const badge = document.getElementById('platform-badge');
+    const label = document.getElementById('platform-label');
+    if (badge && label) {
+      label.textContent = '⬤ ' + platform + ' detected';
+      badge.style.display = 'block';
+    }
   }
 });
 

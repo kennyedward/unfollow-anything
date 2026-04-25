@@ -1,15 +1,20 @@
 {
   "manifest_version": 3,
-  "name": "LinkedIn Page Unfollower",
-  "version": "1.0",
-  "description": "Automatically unfollow LinkedIn pages you follow",
+  "name": "Unfollow Anything",
+  "version": "2.0",
+  "description": "Bulk unfollow on LinkedIn, X (Twitter), and Reddit — with a whitelist to keep what matters",
   "permissions": ["activeTab", "scripting", "storage"],
   "action": {
     "default_popup": "popup.html"
   },
   "content_scripts": [
     {
-      "matches": ["https://www.linkedin.com/*"],
+      "matches": [
+        "https://www.linkedin.com/*",
+        "https://x.com/*",
+        "https://twitter.com/*",
+        "https://www.reddit.com/*"
+      ],
       "js": ["content.js"]
     }
   ]

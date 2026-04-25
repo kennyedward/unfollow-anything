@@ -213,7 +213,7 @@
     <div class="logo">LI</div>
     <div>
       <div class="title">Page Unfollower</div>
-      <div class="subtitle">Bulk unfollow LinkedIn pages</div>
+      <div class="subtitle">Bulk unfollow on LinkedIn</div>
     </div>
   </div>
 
@@ -226,9 +226,12 @@
     <!-- RUN PANEL -->
     <div class="panel active" id="panel-run">
       <div class="instruction">
-        <div class="step"><div class="step-num">1</div><div>Go to <a href="https://www.linkedin.com/feed/following/" target="_blank">linkedin.com/feed/following</a></div></div>
-        <div class="step"><div class="step-num">2</div><div>Filter by "Pages" using the LinkedIn dropdown</div></div>
+        <div class="step"><div class="step-num">1</div><div>Navigate to your following/subscriptions page on LinkedIn, X, or Reddit</div></div>
+        <div class="step"><div class="step-num">2</div><div>Platform is auto-detected from the URL</div></div>
         <div class="step"><div class="step-num">3</div><div>Click Start below</div></div>
+        <div id="platform-badge" style="margin-top:10px; display:none;">
+          <span style="font-family:'IBM Plex Mono',monospace; font-size:10px; text-transform:uppercase; letter-spacing:0.06em; color:var(--accent); background:var(--accent-dim); border:1px solid var(--accent-border); padding:3px 8px; border-radius:4px;" id="platform-label"></span>
+        </div>
       </div>
 
       <div class="delay-row">
@@ -253,7 +256,7 @@
       <button class="btn btn-start" id="start-btn">▶ Start Unfollowing</button>
       <button class="btn btn-stop" id="stop-btn" style="display:none; margin-top:8px;">■ Stop</button>
 
-      <p class="warn">Works on the following feed page only.<br>Higher delay = safer, less likely to get flagged.</p>
+      <p class="warn">Works on LinkedIn.<br>Higher delay = safer, less likely to get flagged.</p>
     </div>
 
     <!-- WHITELIST PANEL -->
@@ -276,7 +279,7 @@
 
   <div id="not-linkedin" class="not-linkedin" style="display:none;">
     <span>⚠️</span>
-    Not on LinkedIn.<br>Navigate to <strong>linkedin.com/feed/following</strong> first.
+    Not on a supported platform.<br>Go to <strong>LinkedIn</strong>, <strong>X (Twitter)</strong>, or <strong>Reddit</strong> first.
   </div>
 
   <script src="popup.js"></script>
