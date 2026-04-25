@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>LinkedIn Unfollower</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500&display=swap');
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0a0a0a;
+      --surface: #141414;
+      --surface2: #1c1c1c;
+      --border: #2a2a2a;
+      --text: #e8e8e8;
+      --muted: #666;
+      --accent: #c8ff00;
+      --accent-dim: rgba(200, 255, 0, 0.1);
+      --accent-border: rgba(200, 255, 0, 0.3);
+      --danger: #ff4444;
+      --danger-dim: rgba(255, 68, 68, 0.1);
+    }
+
+    body {
+      width: 300px;
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'IBM Plex Sans', sans-serif;
+      font-size: 13px;
+    }
+
+    /* HEADER */
+    .header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 16px 20px 12px;
+      border-bottom: 1px solid var(--border);
+    }
+    .logo {
+      width: 28px; height: 28px;
+      background: var(--accent);
+      border-radius: 4px;
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'IBM Plex Mono', monospace;
+      font-weight: 600; font-size: 13px; color: #000;
+      flex-shrink: 0;
+    }
+    .title { font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; }
+    .subtitle { font-size: 11px; color: var(--muted); margin-top: 1px; }
+
+    /* TABS */
+    .tabs {
+      display: flex;
+      border-bottom: 1px solid var(--border);
+    }
+    .tab {
+      flex: 1;
+      padding: 9px 0;
+      background: none;
+      border: none;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--muted);
+      cursor: pointer;
+      transition: color 0.15s;
+      position: relative;
+    }
+    .tab.active { color: var(--accent); }
+    .tab.active::after {
+      content: '';
+      position: absolute;
+      bottom: -1px; left: 0; right: 0;
+      height: 2px;
+      background: var(--accent);
+    }
+    .tab-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--accent);
+      color: #000;
+      font-size: 9px;
+      font-weight: 700;
+      width: 16px; height: 16px;
+      border-radius: 8px;
+      margin-left: 5px;
+      vertical-align: middle;
+    }
+
+    /* PANELS */
+    .panel { display: none; padding: 16px 20px 20px; }
+    .panel.active { display: block; }
+
+    /* RUN PANEL */
+    .instruction {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 12px;
+      margin-bottom: 14px;
+      font-size: 12px;
+      line-height: 1.6;
+      color: var(--muted);
+    }
+    .instruction a { color: var(--accent); text-decoration: none; }
+    .instruction a:hover { text-decoration: underline; }
+    .step { display: flex; align-items: flex-start; gap: 8px; margin-bottom: 6px; }
+    .step:last-child { margin-bottom: 0; }
+    .step-num {
+      font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: var(--accent);
+      background: var(--accent-dim); width: 18px; height: 18px; border-radius: 3px;
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px;
+    }
+    .delay-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+    .delay-label { font-size: 12px; color: var(--muted); font-family: 'IBM Plex Mono', monospace; }
+    .delay-control { display: flex; align-items: center; gap: 8px; }
+    .delay-control input[type="range"] {
+      -webkit-appearance: none; width: 100px; height: 3px;
+      background: var(--border); border-radius: 2px; outline: none;
+    }
+    .delay-control input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none; width: 14px; height: 14px;
+      background: var(--accent); border-radius: 50%; cursor: pointer;
+    }
+    .delay-val { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--accent); width: 40px; text-align: right; }
+
+    .status-box {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 6px; padding: 12px; margin-bottom: 14px; display: none;
+    }
+    .status-box.visible { display: block; }
+    .status-count { font-family: 'IBM Plex Mono', monospace; font-size: 28px; font-weight: 600; color: var(--accent); line-height: 1; }
+    .status-label { font-size: 11px; color: var(--muted); margin-top: 4px; }
+    .pulse { display: inline-block; width: 6px; height: 6px; background: var(--accent); border-radius: 50%; margin-right: 6px; animation: pulse 1s infinite; }
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.2; } }
+
+    .btn {
+      width: 100%; padding: 10px; border: none; border-radius: 6px;
+      font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600;
+      letter-spacing: 0.06em; text-transform: uppercase; cursor: pointer; transition: all 0.15s ease;
+    }
+    .btn-start { background: var(--accent); color: #000; }
+    .btn-start:hover { background: #d8ff22; transform: translateY(-1px); }
+    .btn-stop { background: var(--danger-dim); color: var(--danger); border: 1px solid var(--danger); }
+    .btn-stop:hover { background: rgba(255,68,68,0.2); }
+    .btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+
+    .done-msg {
+      display: none; text-align: center; padding: 8px;
+      background: var(--accent-dim); border: 1px solid var(--accent-border);
+      border-radius: 6px; font-family: 'IBM Plex Mono', monospace; font-size: 11px;
+      color: var(--accent); margin-bottom: 12px;
+    }
+    .done-msg.visible { display: block; }
+    .warn { font-size: 10px; color: var(--muted); text-align: center; margin-top: 12px; line-height: 1.5; }
+
+    /* WHITELIST PANEL */
+    .wl-input-row { display: flex; gap: 8px; margin-bottom: 12px; }
+    .wl-input {
+      flex: 1; background: var(--surface); border: 1px solid var(--border);
+      border-radius: 6px; padding: 8px 10px; color: var(--text);
+      font-family: 'IBM Plex Sans', sans-serif; font-size: 12px; outline: none;
+      transition: border-color 0.15s;
+    }
+    .wl-input::placeholder { color: var(--muted); }
+    .wl-input:focus { border-color: var(--accent); }
+    .btn-add {
+      background: var(--accent); color: #000; border: none; border-radius: 6px;
+      padding: 8px 12px; font-family: 'IBM Plex Mono', monospace; font-size: 11px;
+      font-weight: 600; cursor: pointer; white-space: nowrap; transition: background 0.15s;
+    }
+    .btn-add:hover { background: #d8ff22; }
+
+    .wl-empty { text-align: center; padding: 24px 0; color: var(--muted); font-size: 12px; line-height: 1.7; }
+    .wl-empty-icon { font-size: 22px; display: block; margin-bottom: 6px; opacity: 0.4; }
+
+    .wl-list { display: flex; flex-direction: column; gap: 4px; max-height: 200px; overflow-y: auto; }
+    .wl-list::-webkit-scrollbar { width: 4px; }
+    .wl-list::-webkit-scrollbar-track { background: transparent; }
+    .wl-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+    .wl-item {
+      display: flex; align-items: center; justify-content: space-between;
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 6px; padding: 8px 10px;
+      animation: fadeIn 0.15s ease;
+    }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
+    .wl-item-name { font-size: 12px; color: var(--text); flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .wl-item-remove {
+      background: none; border: none; color: var(--muted); cursor: pointer;
+      font-size: 14px; line-height: 1; padding: 0 0 0 8px; flex-shrink: 0;
+      transition: color 0.15s;
+    }
+    .wl-item-remove:hover { color: var(--danger); }
+
+    .wl-hint { font-size: 10px; color: var(--muted); margin-top: 10px; line-height: 1.5; }
+
+    /* NOT LINKEDIN */
+    .not-linkedin { text-align: center; padding: 28px 20px; color: var(--muted); font-size: 12px; line-height: 1.7; }
+    .not-linkedin span { display: block; font-size: 24px; margin-bottom: 8px; }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <div class="logo">LI</div>
+    <div>
+      <div class="title">Page Unfollower</div>
+      <div class="subtitle">Bulk unfollow LinkedIn pages</div>
+    </div>
+  </div>
+
+  <div id="main-ui">
+    <div class="tabs">
+      <button class="tab active" data-tab="run">Run</button>
+      <button class="tab" data-tab="whitelist">Keep <span class="tab-badge" id="wl-badge" style="display:none">0</span></button>
+    </div>
+
+    <!-- RUN PANEL -->
+    <div class="panel active" id="panel-run">
+      <div class="instruction">
+        <div class="step"><div class="step-num">1</div><div>Go to <a href="https://www.linkedin.com/feed/following/" target="_blank">linkedin.com/feed/following</a></div></div>
+        <div class="step"><div class="step-num">2</div><div>Filter by "Pages" using the LinkedIn dropdown</div></div>
+        <div class="step"><div class="step-num">3</div><div>Click Start below</div></div>
+      </div>
+
+      <div class="delay-row">
+        <span class="delay-label">Delay</span>
+        <div class="delay-control">
+          <input type="range" id="delay-slider" min="800" max="3000" step="200" value="1500" />
+          <span class="delay-val" id="delay-display">1.5s</span>
+        </div>
+      </div>
+
+      <div class="status-box" id="status-box">
+        <div style="display:flex; align-items:center; margin-bottom:6px;">
+          <span class="pulse"></span>
+          <span style="font-size:11px; color:var(--muted); font-family:'IBM Plex Mono',monospace; text-transform:uppercase; letter-spacing:0.06em;">Running</span>
+        </div>
+        <div class="status-count" id="count-display">0</div>
+        <div class="status-label">pages unfollowed</div>
+      </div>
+
+      <div class="done-msg" id="done-msg"></div>
+
+      <button class="btn btn-start" id="start-btn">▶ Start Unfollowing</button>
+      <button class="btn btn-stop" id="stop-btn" style="display:none; margin-top:8px;">■ Stop</button>
+
+      <p class="warn">Works on the following feed page only.<br>Higher delay = safer, less likely to get flagged.</p>
+    </div>
+
+    <!-- WHITELIST PANEL -->
+    <div class="panel" id="panel-whitelist">
+      <div class="wl-input-row">
+        <input class="wl-input" id="wl-input" type="text" placeholder="Apple, Google, Doctolib..." maxlength="100" />
+        <button class="btn-add" id="wl-add">Add</button>
+      </div>
+
+      <div id="wl-empty" class="wl-empty">
+        <span class="wl-empty-icon">🛡</span>
+        No pages protected yet.<br>Add names you want to keep.
+      </div>
+
+      <div class="wl-list" id="wl-list" style="display:none"></div>
+
+      <p class="wl-hint">Comma-separate multiple entries: "Apple, Google, Doctolib". Partial names work — "Apple" matches "Apple Inc". Case-insensitive.</p>
+    </div>
+  </div>
+
+  <div id="not-linkedin" class="not-linkedin" style="display:none;">
+    <span>⚠️</span>
+    Not on LinkedIn.<br>Navigate to <strong>linkedin.com/feed/following</strong> first.
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>
